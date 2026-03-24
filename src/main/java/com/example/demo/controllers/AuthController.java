@@ -26,6 +26,8 @@ import com.example.demo.dto.PassengerSignupRequestDto;
 import com.example.demo.services.AuthService;
 import com.example.demo.services.JwtService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
@@ -54,7 +56,8 @@ public class AuthController {
 	}
 
 	@PostMapping("/signin/passenger")
-	public ResponseEntity<?> signIn(@RequestBody AuthRequestDto authRequestDto, HttpServletResponse response) {
+	public ResponseEntity<?> signIn(@RequestBody AuthRequestDto authRequestDto, HttpServletRequest httpServletRequest,
+			HttpServletResponse response) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(authRequestDto.getEmail(), authRequestDto.getPassword()));
 
@@ -66,5 +69,13 @@ public class AuthController {
 			return new ResponseEntity<>(AuthResponseDto.builder().success(true).build(), HttpStatus.OK);
 		}
 		throw new UsernameNotFoundException("Username not found");
+	}
+
+	@GetMapping("/validate")
+	public ResponseEntity<?> validate(HttpServletRequest request) {
+		for (Cookie cookie : request.getCookies()) {
+			System.out.println(cookie.getName() + " " + cookie.getValue());
+		}
+		return new ResponseEntity<>("Success", HttpStatus.OK);
 	}
 }

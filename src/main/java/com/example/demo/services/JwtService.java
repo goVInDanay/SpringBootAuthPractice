@@ -20,17 +20,11 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService implements CommandLineRunner {
-
-	private final SpringSecurity springSecurity;
 	@Value("${jwt.expiry}")
 	private int expiry;
 
 	@Value("${jwt.secret}")
 	private String SECRET;
-
-	JwtService(SpringSecurity springSecurity) {
-		this.springSecurity = springSecurity;
-	}
 
 	// creates a brand new token
 	public String createToken(Map<String, Object> payload, String username) {
@@ -41,6 +35,12 @@ public class JwtService implements CommandLineRunner {
 
 	public String createToken(String email) {
 		return createToken(new HashMap<>(), email);
+	}
+
+	public String extractEmail(String token) {
+		String claim = extractClaim(token, Claims::getSubject);
+		System.out.println(claim);
+		return claim;
 	}
 
 	public Object extractPayload(String token, String payloadType) {
@@ -80,6 +80,7 @@ public class JwtService implements CommandLineRunner {
 		map.put("email", "a@b.com");
 		map.put("phoneNumber", "99992973927");
 		String result = createToken(map, "Govind");
+		extractEmail(result);
 		System.out.println("Generated token is: " + result);
 		System.out.println(extractPayload(result, "phoneNumber").toString());
 		System.out.println(validateToken(result, "govindnacharya@gmail.com"));
