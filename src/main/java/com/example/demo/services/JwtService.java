@@ -33,39 +33,43 @@ public class JwtService implements CommandLineRunner {
 	}
 
 	// creates a brand new token
-	private String createToken(Map<String, Object> payload, String username) {
+	public String createToken(Map<String, Object> payload, String username) {
 		return Jwts.builder().claims(payload).issuedAt(new Date())
 				.expiration(new Date(System.currentTimeMillis() + expiry)).subject(username).signWith(getSignInKey())
 				.compact();
 	}
 
-	private Object extractPayload(String token, String payloadType) {
+	public String createToken(String email) {
+		return createToken(new HashMap<>(), email);
+	}
+
+	public Object extractPayload(String token, String payloadType) {
 		Claims claims = extractAllClaims(token);
 		return claims.get(payloadType);
 	}
 
-	private Boolean isTokenExpired(String token) {
+	public Boolean isTokenExpired(String token) {
 		return extractExpiration(token).before(new Date());
 	}
 
-	private Date extractExpiration(String token) {
+	public Date extractExpiration(String token) {
 		return extractClaim(token, Claims::getExpiration);
 	}
 
-	private Claims extractAllClaims(String token) {
+	public Claims extractAllClaims(String token) {
 		return Jwts.parser().verifyWith((SecretKey) getSignInKey()).build().parseSignedClaims(token).getPayload();
 	}
 
-	private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
 		final Claims claims = extractAllClaims(token);
 		return claimsResolver.apply(claims);
 	}
 
-	private Key getSignInKey() {
+	public Key getSignInKey() {
 		return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private boolean validateToken(String token, String email) {
+	public boolean validateToken(String token, String email) {
 		final String userEmail = extractPayload(token, "email").toString();
 		return userEmail.equals(userEmail) && !isTokenExpired(token);
 	}
