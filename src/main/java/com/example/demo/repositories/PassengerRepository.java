@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.models.Passenger;
+import com.example.entityservice.models.Passenger;
 
 @Repository
 public interface PassengerRepository extends JpaRepository<Passenger, Long> {

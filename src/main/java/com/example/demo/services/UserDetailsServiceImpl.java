@@ -9,8 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.helpers.AuthPassengerDetails;
-import com.example.demo.models.Passenger;
 import com.example.demo.repositories.PassengerRepository;
+import com.example.entityservice.models.Passenger;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

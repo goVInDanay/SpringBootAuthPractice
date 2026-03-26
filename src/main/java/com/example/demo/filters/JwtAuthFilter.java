@@ -24,8 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
-	@Autowired
-	private UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 
 	private final JwtService jwtService;
 
@@ -57,19 +56,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		}
 
 		try {
-			if (token == null) {
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				return;
-			}
-			String email = jwtService.extractEmail(token);
-			if (email != null) {
-				UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-				if (jwtService.validateToken(token, email)) {
-					UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-							userDetails, null);
-					usernamePasswordAuthenticationToken
-							.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+			if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+				String email = jwtService.extractEmail(token);
+				if (email != null) {
+					UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+					if (jwtService.validateToken(token, email)) {
+						UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+								userDetails, null, userDetails.getAuthorities());
+						usernamePasswordAuthenticationToken
+								.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+						SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -81,7 +78,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
 		String path = request.getServletPath();
-		if (pathMatcher.match("/api/v1/auth/login", path) || pathMatcher.match("/api/v1/auth/register", path)) {
+		if (pathMatcher.match("/api/v1/auth/signin/*", path) || pathMatcher.match("/api/v1/auth/signup/*", path)) {
 			return true;
 		}
 		return false;

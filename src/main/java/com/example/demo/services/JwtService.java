@@ -39,7 +39,6 @@ public class JwtService implements CommandLineRunner {
 
 	public String extractEmail(String token) {
 		String claim = extractClaim(token, Claims::getSubject);
-		System.out.println(claim);
 		return claim;
 	}
 
@@ -70,8 +69,8 @@ public class JwtService implements CommandLineRunner {
 	}
 
 	public boolean validateToken(String token, String email) {
-		final String userEmail = extractPayload(token, "email").toString();
-		return userEmail.equals(userEmail) && !isTokenExpired(token);
+		final String userEmail = extractEmail(token);
+		return userEmail.equals(email) && !isTokenExpired(token);
 	}
 
 	@Override
@@ -81,8 +80,5 @@ public class JwtService implements CommandLineRunner {
 		map.put("phoneNumber", "99992973927");
 		String result = createToken(map, "Govind");
 		extractEmail(result);
-		System.out.println("Generated token is: " + result);
-		System.out.println(extractPayload(result, "phoneNumber").toString());
-		System.out.println(validateToken(result, "govindnacharya@gmail.com"));
 	}
 }

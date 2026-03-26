@@ -2,7 +2,7 @@ package com.example.demo.dto;
 
 import java.time.LocalDateTime;
 
-import com.example.demo.models.Passenger;
+import com.example.entityservice.models.Passenger;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
